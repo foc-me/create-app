@@ -1,18 +1,23 @@
-import terser from "@rollup/plugin-terser"
 import copy from "rollup-plugin-copy"
+import resolve from "@rollup/plugin-node-resolve"
+import cleanup from "rollup-plugin-cleanup"
 import pick from "@focme/rollup-plugin-pick"
 
 export default {
+    external: [
+        "prompts",
+        "@focme/argv",
+        "@focme/stringify-json"
+    ],
     input: "./src/index.js",
     output: {
         file: "./dist/index.js",
-        format: "cjs",
+        format: "esm",
         banner: "#!/usr/bin/env node"
     },
     plugins: [
-        terser({
-            mangle: { toplevel: true }
-        }),
+        resolve(),
+        cleanup(),
         copy({
             targets: [
                 { src: ["./template"], dest: "./dist" },
@@ -22,10 +27,10 @@ export default {
         pick([
             "name",
             "version",
-            ["bin", { "create-rsk": "./index.js" }],
-            ["main", "./index.js"],
+            ["bin", { "create-app": "./index.js" }],
             "description",
             "keywords",
+            "type",
             ["files", ["index.js", "readme.md", "package.json", "template"]],
             "author",
             "repository",

@@ -1,39 +1,24 @@
-# @focme/create-rsk  
+# @focme/create-app  
 
-a initial cli for react ssr with koa2  
+a initial cli for @focme/app
 
-## command  
+## command
 
 ```shell
-# create project in current dir
-npm create @focme/rsk <project-name>
+# create project
+npm create @focme/app <project-path>
 # or
-# create project in specified dir
-npm create @focme/rsk <project-path> <project-name>
+npm create @focme/app <project-path> <project-name>
 ```
 
-## option  
+## example
 
 ```shell
-npm create @focme/rsk <project-path> <project-name> --options
+# position ./test-project
+# project name 'test-project'
+npm create test-project
+
+## position /**/test-project
+# project name '@focme/test-project'
+npm create /**/test-project @focme/test-project
 ```
-
-|option |describe          |
-|-------|------------------|
-|--lib  |create lib project|
-|--ts   |use typescript    |
-|--react|use react         |
-
-**--lib**  
-
-create `rollup` project with `--lib`  
-or create `webpack` + `koa` project without `--lib`  
-
-**--react**  
-
-use react  
-can not use with `--lib`
-
-**--ts**  
-
-use typescript  

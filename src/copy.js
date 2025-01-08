@@ -1,30 +1,14 @@
 import fs from "node:fs"
 import path from "node:path"
-import { ask, yes } from "./ask"
+import { makePrompts } from "./base.js"
 
 const { stdout: output } = process
-const templateHome = path.resolve(__dirname, "./template")
+const templateHome = path.resolve(import.meta.dirname, "../template")
 
-function makeTemplate(option) {
-    const { lib, ts, react } = option
-    if (lib && ts) return "lib-ts"
-    if (lib) return "lib"
-    if (ts && react) return "koa-react-ts"
-    if (react) return "koa-react"
-    if (ts) return "koa-ts"
-    return "koa"
-}
-
-async function createDirector(director, ask = true) {
-    if (fs.existsSync(director) && fs.statSync(director).isDirectory()) {
-        if (!ask) return
-        const result = await yes(`${director} already exist. continue? (y/n): `)
-        if (!result) {
-            output.write("stop create")
-            process.exit(0)
-        }
+async function makeDirection(director) {
+    if (!fs.existsSync(director) || !fs.statSync(director).isDirectory()) {
+        fs.mkdirSync(director, { recursive: true })
     }
-    fs.mkdirSync(director, { recursive: true })
 }
 
 function makeTemplateFiles(itemPath) {
@@ -51,15 +35,19 @@ async function copyFile(files, target) {
     let current = 0
     for (const [name, [template, ...dir], origin = name] of files) {
         const originItemPath = path.resolve(templateHome, template, ...dir, origin)
-        
+
         const targetPath = path.resolve(target, ...dir)
         const targetItemPath = path.resolve(targetPath, name)
-        await createDirector(targetPath, false)
+        await makeDirection(targetPath)
 
         const exist = fs.existsSync(targetItemPath)
         if (exist && fs.statSync(targetItemPath).isFile()) {
             if (!["replace-all", "skip-all"].includes(replace)) {
-                const result = await ask(`file '${targetItemPath}' already exist. \nreplace file? (r: replace / ra: replace all / s: skip / sa: skip all): `)
+                const result = await makePrompts({
+                    type: "text",
+                    initial: "r",
+                    message: `file '${targetItemPath}' already exist. \nreplace it? (r: replace / ra: replace all / s: skip / sa: skip all): `
+                })
                 if (result === "r") replace = "replace"
                 if (result === "ra") replace = "replace-all"
                 if (result === "s") replace = "skip"
@@ -80,35 +68,20 @@ async function copyFile(files, target) {
     output.cursorTo(0)
 }
 
-function makeIgnore(template) {
-    switch (template) {
-        case "lib-ts":
-        case "lib": return "lib.gitignore"
-        case "koa-react-ts": return "koa-react-ts.gitignore"
-        case "koa-react": return "koa-react.gitignore"
-        case "koa": return "koa.gitignore"
-        default: return
-    }
-}
-
-async function copy(option) {
-    const { director } = option
-    await createDirector(director)
-
-    const template = makeTemplate(option)
+export default async function(option) {
+    const { position, template, gitignore } = option
     const templatePath = path.resolve(templateHome, template)
-    const templateFiles = makeTemplateFiles(templatePath).map(item => {
+    const templateFiles = makeTemplateFiles(templatePath).filter(item => {
+        return item !== ".gitignore"
+    }).map(item => {
         if (Array.isArray(item)) {
             return [item[0], [template, ...item[1]]]
         }
         return [item, [template]]
     })
-    const ignoreFile = makeIgnore(template)
-    const ignorePath = path.resolve(templateHome, "ignore", ignoreFile)
+    const ignorePath = path.resolve(templateHome, "ignore", gitignore)
     if (fs.existsSync(ignorePath) && fs.statSync(ignorePath).isFile()) {
-        templateFiles.push([".gitignore", ["ignore"], ignoreFile])
+        templateFiles.push([".gitignore", ["ignore"], gitignore])
     }
-    await copyFile(templateFiles, director)
+    await copyFile(templateFiles, position)
 }
-
-export default copy

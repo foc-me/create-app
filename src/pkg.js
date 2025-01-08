@@ -15,9 +15,9 @@ function makePkg(pkgPath) {
     }
 }
 
-async function pkg(option) {
-    const { director, project, description, author } = option
-    const pkgPath = path.join(director, "package.json")
+export default async function(option) {
+    const { position, project, description = "", author = "" } = option
+    const pkgPath = path.join(position, "package.json")
     const content = Object.assign(makePkg(pkgPath), {
         name: project,
         description,
@@ -25,5 +25,3 @@ async function pkg(option) {
     })
     fs.writeFileSync(pkgPath, stringify(content))
 }
-
-export default pkg
