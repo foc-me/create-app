@@ -8,6 +8,7 @@ dist
 spa
 tsc
 client
+.npmrc
 yarn.lock
 pnpm-lock.yaml
 package-lock.json

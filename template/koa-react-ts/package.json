@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "project-description",
   "author": "project-author",
-  "license": "MIT",
+  "license": "ISC",
   "scripts": {
     "start": "node ./script/build.js client --mode development && nodemon --exec \"node ./script/build.js service --mode development && node ./dist/index.js\"",
     "start:spa": "node ./script/start.js --mode development",

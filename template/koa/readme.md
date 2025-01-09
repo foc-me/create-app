@@ -1,3 +1,3 @@
-# @focme/rsk-template
+# koa template
 
-this is the template for create-rsk2
+this is the template for @focme/create-app

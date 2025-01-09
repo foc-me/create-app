@@ -1,6 +1,6 @@
 import path from "node:path"
 import createArgv from "@focme/argv"
-import { makePrompts, appTypes } from "./base.js"
+import { makePrompts, appTypes, viewTypes } from "./base.js"
 
 async function makePosition() {
     const value = await makePrompts({
@@ -31,12 +31,12 @@ async function makeAuthor() {
 function makeAppType() {
     return makePrompts({
         type: "select",
-        message: "app type: ",
+        message: "select app type: ",
         choices: [
             { title: "rollup library", value: appTypes.rollup },
             { title: "koa service", value: appTypes.koa },
-            { title: "webpack spa", value: appTypes.webpack },
-            { title: "electron application", value: appTypes.electron },
+            // { title: "webpack project", value: appTypes.webpack },
+            // { title: "electron application", value: appTypes.electron },
             { title: "not sure", description: "only create a direction", value: appTypes.direction }
         ]
     })
@@ -60,6 +60,17 @@ async function makeReactSSR() {
     })
 }
 
+async function makeView() {
+    return makePrompts({
+        type: "select",
+        message: "select view type: ",
+        choices: [
+            { title: "react", value: viewTypes.react },
+            { title: "vue", value: viewTypes.vue }
+        ]
+    })
+}
+
 export default async function() {
     const { _: [position, project] = [] } = createArgv().opt()
     const option = { current: { position, project } }
@@ -73,11 +84,25 @@ export default async function() {
     option.current.description = await makeDescription()
     option.current.author = await makeAuthor()
     option.current.appType = await makeAppType()
-    option.current.typescript = await makeTypescript()
 
     switch (option.current.appType) {
+        case appTypes.rollup:
+            option.current.typescript = await makeTypescript()
+            break
         case appTypes.koa:
             option.current.react = await makeReactSSR()
+            option.current.typescript = await makeTypescript()
+            break
+        // case appTypes.webpack:
+        //     option.current.view = await makeView()
+        //     option.current.typescript = await makeTypescript()
+        //     break
+        // case appTypes.electron:
+        //     option.current.view = await makeView()
+        //     if (option.current.view === viewTypes.react) {
+        //         option.current.typescript = await makeTypescript()
+        //     }
+        //     break
         default: break
     }
 

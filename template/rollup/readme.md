@@ -1,3 +1,3 @@
-# rsk-template lib
+# rollup template
 
-a lib project template with rollup
+this is the template for @focme/create-app

@@ -15,3 +15,8 @@ export const appTypes = {
     electron: "electron",
     direction: "direction"
 }
+
+export const viewTypes = {
+    react: "react",
+    vue: "vue"
+}
